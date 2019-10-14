@@ -1,0 +1,10 @@
+<div>
+  <h1>占いサービス</h1>
+  
+  名前を入力してください。
+  <input #name type="text" (keydown)="onKeyDown($event.keyCode, name.value)">
+  <button (click)="onInputClick(name.value)">OK</button>
+</div>
+<div>
+  あなたの運勢： {{omikuji_result || '(ここに結果が表示されます)'}}
+</div>
