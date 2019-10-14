@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option csharp_namespace = "OmikujiService";
+
+package Omikuji;
+
+// The greeting service definition.
+service Omikuji {
+  // Draws a fortune 
+  rpc DrawOmikuji (OmikujiRequest) returns (OmikujiReply);
+}
+
+// The request message
+message OmikujiRequest {
+  string idempotency_key = 1;
+}
+
+// The response message
+message OmikujiReply {
+  repeated OmikujiRequest request = 1;
+  string message = 2;
+  enum Result {
+    daikichi = 0;
+    chukichi = 1;
+    kichi = 2;
+    shokichi = 3;
+    kyo = 4;
+    daikyo = 5;
+  }
+  Result result = 3;
+}
