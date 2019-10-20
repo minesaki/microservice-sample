@@ -23,20 +23,26 @@ namespace ApiService.Controllers
         }
 
         [HttpPost("omikuji")]
-        public async Task<ApiOmikujiResponse> Omikuji(ApiOmikujiRequest request){
+        public async Task<ApiOmikujiResponse> Omikuji(ApiOmikujiRequest request)
+        {
             var channel = GrpcChannel.ForAddress("https://localhost:5001");
             var client = new Omikuji.OmikujiClient(channel);
 
             try
-            {                
-                var reply = await client.DrawOmikujiAsync(new OmikujiRequest {IdempotencyKey = request.IdempotencyKey});
-                return new ApiOmikujiResponse{
+            {
+                var reply = await client.DrawOmikujiAsync(new OmikujiRequest { IdempotencyKey = request.IdempotencyKey });
+                return new ApiOmikujiResponse
+                {
                     IdempotencyKey = request.IdempotencyKey,
                     Date = DateTime.Now,
                     OmikujiResult = $"{request.UserName} さんの運勢は {reply.Message} です。",
                 };
-            } catch {
-                return new ApiOmikujiResponse{
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine(ex);
+                return new ApiOmikujiResponse
+                {
                     IdempotencyKey = request.IdempotencyKey,
                     Date = DateTime.Now,
                     Error = "## おみくじサービスで障害が発生しています ##"
