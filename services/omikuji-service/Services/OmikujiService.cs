@@ -19,26 +19,37 @@ namespace OmikujiService
 
         public override Task<OmikujiReply> DrawOmikuji(OmikujiRequest request, ServerCallContext context)
         {
-            // ここで本来は冪等性チェックをする
-            Console.WriteLine($"IdempotencyKey: {request.IdempotencyKey} (idempotency key should be unique in xx seconds)");
-
-            // おみくじ結果
-            Result result = draw();
-            return Task.FromResult(new OmikujiReply
+            try
             {
-                Message = getMessage(result),
-                Result = result,
-            });
+                // ここで本来は冪等性チェックをする
+                Console.WriteLine($"IdempotencyKey: {request.IdempotencyKey} (idempotency key should be unique in xx seconds)");
+
+                // おみくじ結果
+                Result result = draw();
+                return Task.FromResult(new OmikujiReply
+                {
+                    Message = getMessage(result),
+                    Result = result,
+                });
+            }
+            finally
+            {
+                // おみくじ実施イベントをRabbitMQに発行
+                new RabbitMQClient().publish("OmikujiDrawn");
+            }
         }
 
-        private Result draw(){
+        private Result draw()
+        {
             Random r = new Random();
-            int result = r.Next(0,5);
+            int result = r.Next(0, 5);
             return (Result)result;
         }
 
-        private string getMessage(Result result){
-            switch(result){
+        private string getMessage(Result result)
+        {
+            switch (result)
+            {
                 case Result.Daikichi: return "大吉";
                 case Result.Chukichi: return "中吉";
                 case Result.Kichi: return "吉";
