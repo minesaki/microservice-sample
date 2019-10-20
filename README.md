@@ -20,13 +20,14 @@ It has a gRPC endpoint only.
 * Angular 8.x (frontend)
 * gRPC + Protocol Buffers (backend internal connections)
 * REST + JSON (backend endpoint for frontend)
-* (WIP) RabbitMQ (for backends event-based communications)
+* RabbitMQ (for backends event-based communications)
 * (WIP) Docker
 * (WIP) Kubernetes
 
 ## Installation
 1. **Running locally (no Docker):**
     - .NET Core 3.x and Angular CLI 8.x required. 
+    - RabbitMQ should be installed and running in default port (5672).
     - Run all services and frontend.
         ``` sh
         $ cd ./services/omikuji-service
@@ -35,6 +36,10 @@ It has a gRPC endpoint only.
         ``` sh
         $ cd ./services/api-service
         $ dotnet run
+        ```        
+        ``` sh
+        $ cd ./services/log-service
+        $ dotnet run
         ```
         ``` sh
         $ cd ./web
@@ -42,3 +47,8 @@ It has a gRPC endpoint only.
         $ npm start
         ```
 2. **Running with Kubernetes:** WIP
+
+## Changelog
+### Oct 20, 2019
+* add functionality of publishing "OmikujiDrawn" event for RabbitMQ to omikuji-service.
+* add log-service. (gRPC endpoint & RabbitMQ subscription)
