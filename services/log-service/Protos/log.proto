@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "LogService";
+
+package Log;
+
+// The greeting service definition.
+service Log {
+  // Sends a greeting
+  rpc WriteLog (LogRequest) returns (LogReply);
+}
+
+// The request message containing the user's name.
+message LogRequest {
+  string message = 1;
+}
+
+// The response message containing the greetings.
+message LogReply {
+  string result = 1;
+}
