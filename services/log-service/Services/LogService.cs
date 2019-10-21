@@ -25,36 +25,51 @@ namespace LogService
 
         public static void Init()
         {
-            var factory = new ConnectionFactory()
+            try
             {
-                HostName = "localhost",
-                UserName = "guest",
-                Password = "guest"
-            };
-            con = factory.CreateConnection();
-            channel = con.CreateModel();
+                var factory = new ConnectionFactory()
+                {
+                    HostName = "localhost",
+                    UserName = "guest",
+                    Password = "guest"
+                };
+                con = factory.CreateConnection();
+                channel = con.CreateModel();
 
-            foreach (var exchange in exchanges)
+                foreach (var exchange in exchanges)
+                {
+                    // Exchange生成
+                    channel.ExchangeDeclare(exchange, "fanout", false, true);
+                    // Queue生成
+                    var queueName = channel.QueueDeclare().QueueName;
+                    // Bind Queue
+                    channel.QueueBind(queueName, exchange, "");
+                    // コンシューマー生成
+                    LogService.consumer = new EventingBasicConsumer(channel);
+                    // 受信イベント定義
+                    consumer.Received += OnLogRequiredEventRaised;
+                    // コンシューマー登録
+                    channel.BasicConsume(queueName, true, consumer);
+                }
+            }
+            catch
             {
-                // Exchange生成
-                channel.ExchangeDeclare(exchange, "fanout", false, true);
-                // Queue生成
-                var queueName = channel.QueueDeclare().QueueName;
-                // Bind Queue
-                channel.QueueBind(queueName, exchange, "");
-                // コンシューマー生成
-                LogService.consumer = new EventingBasicConsumer(channel);
-                // 受信イベント定義
-                consumer.Received += OnLogRequiredEventRaised;
-                // コンシューマー登録
-                channel.BasicConsume(queueName, true, consumer);
+                Shutdown();
             }
         }
 
         public static void Shutdown()
         {
-            channel.Dispose();
-            con.Dispose();
+            if (channel != null)
+            {
+                channel.Dispose();
+                channel = null;
+            }
+            if (con != null)
+            {
+                con.Dispose();
+                con = null;
+            }
         }
 
         private static void WriteEventLog(string time, string eventName)
