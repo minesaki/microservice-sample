@@ -25,13 +25,24 @@ namespace LogService
 
         public static void Init()
         {
+            string rabbitMQHostName = Environment.GetEnvironmentVariable("MQ_HostName");
+            string rabbitMQUserName = Environment.GetEnvironmentVariable("MQ_UserName");
+            string rabbitMQPassword = Environment.GetEnvironmentVariable("MQ_Password");
+
+            if (string.IsNullOrWhiteSpace(rabbitMQHostName) ||
+                string.IsNullOrWhiteSpace(rabbitMQUserName) ||
+                string.IsNullOrWhiteSpace(rabbitMQPassword))
+            {
+                return;
+            }
+
             try
             {
                 var factory = new ConnectionFactory()
                 {
-                    HostName = "localhost",
-                    UserName = "guest",
-                    Password = "guest"
+                    HostName = rabbitMQHostName,
+                    UserName = rabbitMQUserName,
+                    Password = rabbitMQPassword
                 };
                 con = factory.CreateConnection();
                 channel = con.CreateModel();
@@ -54,11 +65,11 @@ namespace LogService
             }
             catch
             {
-                Shutdown();
+                ShutdownRabbitMQ();
             }
         }
 
-        public static void Shutdown()
+        public static void ShutdownRabbitMQ()
         {
             if (channel != null)
             {

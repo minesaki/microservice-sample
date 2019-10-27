@@ -48,7 +48,7 @@ namespace LogService
             // アプリケーション終了時にLogServiceの後処理（RabbitMQの切断処理）
             hostApplicationLifetime.ApplicationStopping.Register(() =>
             {
-                LogService.Shutdown();
+                LogService.ShutdownRabbitMQ();
             });
         }
     }
