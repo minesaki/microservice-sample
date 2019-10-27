@@ -21,7 +21,7 @@ namespace ApiService
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
-                    .ConfigureKestrel(x => x.ListenLocalhost(8080))
+                    .ConfigureKestrel(x => x.ListenAnyIP(8080))
                     .UseStartup<Startup>();
                 });
     }
