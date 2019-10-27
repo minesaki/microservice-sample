@@ -34,8 +34,16 @@ namespace OmikujiService
             }
             finally
             {
-                // おみくじ実施イベントをRabbitMQに発行
-                new RabbitMQClient().publish("OmikujiDrawn");
+                try
+                {
+                    // おみくじ実施イベントをRabbitMQに発行
+                    new RabbitMQClient().publish("OmikujiDrawn");
+                }
+                catch (Exception ex)
+                {
+                    // イベント発行に失敗してもエラーとしない
+                    System.Console.WriteLine(ex);
+                }
             }
         }
 
