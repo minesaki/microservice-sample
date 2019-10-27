@@ -25,7 +25,9 @@ namespace ApiService.Controllers
         [HttpPost("omikuji")]
         public async Task<ApiOmikujiResponse> Omikuji(ApiOmikujiRequest request)
         {
-            var channel = GrpcChannel.ForAddress("https://localhost:5001");
+            string omikujiServiceUrl = Environment.GetEnvironmentVariable("URL_OmikujiService");
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            var channel = GrpcChannel.ForAddress(omikujiServiceUrl);
             var client = new Omikuji.OmikujiClient(channel);
 
             try
