@@ -50,9 +50,19 @@ It also provides a gRPC endpoint.
         $ npm install   # required only for the first time.
         $ npm start
         ```
-2. **Running with Kubernetes:** WIP
+2. **Running with Kubernetes:**
+    - Docker and Kubernetes required.  
+        *Note: Developed with Docker for Windows. Some components (e.g. Nginx Ingress controller) may not work properly on the other environments.*
+    - RabbitMQ is NOT required to be installed on your machine.
+    - Run the following command.
+        ``` sh
+        $ cd ./deploy
+        $ ./deploy_k8s_all.sh
+        ```
 
 ## Changelog
+### Nov 4, 2019
+* add Dockerfiles, manifests(yaml) and scripts for deploying on kubernetes.
 ### Oct 22, 2019
 * fix log-service startup. (should start without RabbitMQ)
 ### Oct 20, 2019
