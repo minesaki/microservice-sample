@@ -52,9 +52,11 @@ It also provides a gRPC endpoint.
         ```
 2. **Running with Kubernetes:**
     - Docker and Kubernetes required.  
-        *Note: Developed with Docker for Windows. Some components (e.g. Nginx Ingress controller) may not work properly on the other environments.*
-    - RabbitMQ is NOT required to be installed on your machine.
-    - Run the following command.
+
+        *Note: Developed with Docker for Windows. Some components (e.g. Nginx Ingress controller) may not work properly on the other environments.*  
+
+        *Note: RabbitMQ is NOT required to be installed on your machine.*
+    - Run the following commands.
         ``` sh
         $ cd ./deploy
         $ ./deploy_k8s_all.sh
