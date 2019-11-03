@@ -24,8 +24,7 @@ It also provides a gRPC endpoint.
 * gRPC + Protocol Buffers (backend internal connections)
 * REST + JSON (backend endpoint for frontend)
 * RabbitMQ (for backends event-based communications)
-* (WIP) Docker
-* (WIP) Kubernetes
+* Docker/Kubernetes
 
 ## Installation
 1. **Running locally (no Docker):**
