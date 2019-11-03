@@ -8,6 +8,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text.Json;
 using System.Text;
+using System.Threading;
 
 namespace LogService
 {
@@ -25,6 +26,8 @@ namespace LogService
 
         public static void Init()
         {
+            System.Console.WriteLine("Initializing...");
+
             string rabbitMQHostName = Environment.GetEnvironmentVariable("MQ_HostName");
             string rabbitMQUserName = Environment.GetEnvironmentVariable("MQ_UserName");
             string rabbitMQPassword = Environment.GetEnvironmentVariable("MQ_Password");
@@ -36,36 +39,54 @@ namespace LogService
                 return;
             }
 
-            try
+            int retryCount = 0;
+            bool connectRabbitMQSucceeded = false;
+            while (!connectRabbitMQSucceeded && retryCount < 10)
             {
-                var factory = new ConnectionFactory()
+                try
                 {
-                    HostName = rabbitMQHostName,
-                    UserName = rabbitMQUserName,
-                    Password = rabbitMQPassword
-                };
-                con = factory.CreateConnection();
-                channel = con.CreateModel();
+                    var factory = new ConnectionFactory()
+                    {
+                        HostName = rabbitMQHostName,
+                        UserName = rabbitMQUserName,
+                        Password = rabbitMQPassword
+                    };
+                    con = factory.CreateConnection();
+                    channel = con.CreateModel();
 
-                foreach (var exchange in exchanges)
+                    foreach (var exchange in exchanges)
+                    {
+                        // Exchange生成
+                        channel.ExchangeDeclare(exchange, "fanout", false, true);
+                        // Queue生成
+                        var queueName = channel.QueueDeclare().QueueName;
+                        // Bind Queue
+                        channel.QueueBind(queueName, exchange, "");
+                        // コンシューマー生成
+                        LogService.consumer = new EventingBasicConsumer(channel);
+                        // 受信イベント定義
+                        consumer.Received += OnLogRequiredEventRaised;
+                        // コンシューマー登録
+                        channel.BasicConsume(queueName, true, consumer);
+                    }
+
+                    connectRabbitMQSucceeded = true;
+                }
+                catch
                 {
-                    // Exchange生成
-                    channel.ExchangeDeclare(exchange, "fanout", false, true);
-                    // Queue生成
-                    var queueName = channel.QueueDeclare().QueueName;
-                    // Bind Queue
-                    channel.QueueBind(queueName, exchange, "");
-                    // コンシューマー生成
-                    LogService.consumer = new EventingBasicConsumer(channel);
-                    // 受信イベント定義
-                    consumer.Received += OnLogRequiredEventRaised;
-                    // コンシューマー登録
-                    channel.BasicConsume(queueName, true, consumer);
+                    retryCount++;
+                    Thread.Sleep(1000);
                 }
             }
-            catch
+
+            if (connectRabbitMQSucceeded)
+            {
+                System.Console.WriteLine("Initializing completed successfully.");
+            }
+            else
             {
                 ShutdownRabbitMQ();
+                System.Console.WriteLine("Initializing completed. (RabbitMQ init failed)");
             }
         }
 
