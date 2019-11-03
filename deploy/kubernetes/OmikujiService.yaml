@@ -1,0 +1,42 @@
+# omikuji-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-omikuji-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-omikuji-service
+  template:
+    metadata:
+      labels:
+        app: app-omikuji-service
+    spec:
+      containers:
+      - name: app-omikuji-service
+        image: omikuji-service:1.0.0
+        ports:
+        - containerPort: 5001
+        env:
+        - name: MQ_HostName
+          value: rabbitmq-service
+        - name: MQ_UserName
+          value: guest
+        - name: MQ_Password
+          value: guest
+
+---
+# Service(OmikujiService)
+apiVersion: v1
+kind: Service
+metadata:
+  name: omikuji-service
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 5001
+    targetPort: 5001
+  selector:
+    app: app-omikuji-service

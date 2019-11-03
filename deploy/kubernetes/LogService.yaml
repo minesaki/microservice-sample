@@ -1,0 +1,42 @@
+# log-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-log-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-log-service
+  template:
+    metadata:
+      labels:
+        app: app-log-service
+    spec:
+      containers:
+      - name: app-log-service
+        image: log-service:1.0.0
+        ports:
+        - containerPort: 5002
+        env:
+        - name: MQ_HostName
+          value: rabbitmq-service
+        - name: MQ_UserName
+          value: guest
+        - name: MQ_Password
+          value: guest
+
+---
+# Service(LogService)
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-service
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 5002
+    targetPort: 5002
+  selector:
+    app: app-log-service

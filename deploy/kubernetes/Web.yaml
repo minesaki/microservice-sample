@@ -1,0 +1,35 @@
+# web
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-web
+  template:
+    metadata:
+      labels:
+        app: app-web
+    spec:
+      containers:
+      - name: app-web
+        image: web:1.0.0
+        ports:
+        - containerPort: 80
+
+---
+# Service(Web)
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 18080
+    targetPort: 80
+  selector:
+    app: app-web
