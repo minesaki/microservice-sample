@@ -60,6 +60,9 @@ It also provides a gRPC endpoint.
         $ cd ./deploy
         $ ./deploy_k8s_all.sh
         ```
+    - Access `http://localhost`
+
+    _WIP: not work properly on Docker for Mac now._
 
 ## Changelog
 ### Nov 4, 2019
